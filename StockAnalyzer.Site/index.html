@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <link href="Content/bootstrap.css" rel="stylesheet">
+
+
+    <style>
+        /*For twitter bootsprap*/
+        .jqstooltip {
+            -webkit-box-sizing: content-box;
+            -moz-box-sizing: content-box;
+            box-sizing: content-box;
+        }
+
+        .vcenter {
+            display: inline-block;
+            vertical-align: middle;
+            float: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="jumbotron text-center">
+                    <h1>Stock Analyzer</h1>
+                    <p>
+                        This website let you analyze stocks
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Options -->
+    <div class="container" id="userOptionsWrapper">
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div>
+                    <div class="form-group">
+                        <label for="numberOfStocks">Number of stocks</label>
+                        <input type="number" value="10" class="form-control" id="numberOfStocks" placeholder="Number of stocks">
+                    </div>
+                    <div class="form-group">
+                        <label for="numberOfDays">Days</label>
+                        <input type="number" value="30" class="form-control" id="numberOfDays" placeholder="Number of days">
+                    </div>
+                    <div class="form-group">
+                        <label for="numberOfClusters">Clusters</label>
+                        <input type="number" value="7" class="form-control" id="numberOfClusters" placeholder="Number of clusters">
+                    </div>
+
+                    <div class="form-group">
+                        <div id="checkboxesContainer">
+                            <span>features for analysis :</span>
+                            <label><input id="openCheckBox" type="checkbox" checked="checked"> Open </label>
+                            <label><input id="highCheckBox" type="checkbox" checked="checked"> High </label>
+                            <label><input id="lowCheckBox" type="checkbox" checked="checked"> Low </label>
+                            <label><input id="closeCheckBox" type="checkbox" checked="checked"> Close </label>
+                        </div>
+                    </div>
+                    <button onclick="gettingStockValuesJson()" class="btn btn-default">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-lg-offset-5">
+                <button id="Loading" class="btn btn-lg btn-warning"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> אל תדאג כפרה הם יגיעו</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="container" id="resultsWrapper">
+        <div class="row">
+            <div class="col-lg-12" id="stocksContainer">
+            </div>
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://omnipotent.net/jquery.sparkline/2.1.2/jquery.sparkline.js"></script>
+    <script src="app/app.js"></script>
+</body>
+</html>
