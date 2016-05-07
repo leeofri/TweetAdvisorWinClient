@@ -20,4 +20,11 @@ namespace StockAnalyzer.Site.Models
         public bool Low { get; set; }
 
     }
+    public class CandidateData
+    {
+        public DateTime startDate { get; set; }
+
+        public DateTime endDate { get; set; }
+
+    }
 }
