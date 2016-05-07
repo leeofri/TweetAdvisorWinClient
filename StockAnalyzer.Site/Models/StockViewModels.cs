@@ -28,16 +28,16 @@ namespace StockAnalyzer.Site.Models
 
     }
 
-    public class CandidateResult
+    public class CandidatesResult
     {
         public int ID { get; set; }
 
-        public int Result { get; set; }
+        public float Result { get; set; }
     }
 
     public class FullResult
     {
-        public CandidateResult[] CandidatesResults { get; set; }
+        public CandidatesResult[] CandidatesResults { get; set; }
 
         public DateTime PredictionDate { get; set; }
     }
