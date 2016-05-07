@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Hadoop;
 using System.IO;
-using BO;
 using System.Text;
 
 namespace StockAnalyzer.Site.Controllers
@@ -49,6 +48,9 @@ namespace StockAnalyzer.Site.Controllers
 
         public object Get([FromUri] CandidateData CandidateData)
         {
+            // Lee test
+            hadoop.init(System.Configuration.ConfigurationManager.AppSettings["javaFilePath"]);
+
             //CreateUserConfigFile(UserOptions, 2);
             string resultString = string.Empty;
             int currDate;
@@ -105,9 +107,6 @@ namespace StockAnalyzer.Site.Controllers
             }
 
             return resultString;
-
-
-            return null;
         }
 
         private Dictionary<string, List<string>> ReadingImportedFileAndCluserTheLines(string path)

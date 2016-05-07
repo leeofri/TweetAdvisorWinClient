@@ -1,65 +1,82 @@
-﻿using System.Linq;
-using SSHWrapper;
+﻿using SSHWrapper;
 using System.IO;
-using BO;
+using System.Linq;
 
 namespace Hadoop
 {
     // hadoop class
     public class HadoopManager
     {
-        public void Run()
-        {   
-            TransferDirectoryToCloudera(Globals.JAVA_FILE_FOLDER);
-            CompilingJavaFilesOnRemote();
+        public bool init(string JAVA_FILE_FOLDER)
+        {
+            sendJavaFiles(JAVA_FILE_FOLDER);
+            bool result = CompilingJavaFilesOnRemote();
+            return result;
+        }
+
+        public void Run(string INPUT_FILE_PATH,string OUTPUT_FILE)
+        {
+            TransferTweetsFilesToRemote(INPUT_FILE_PATH);
             RunHadoopOnRemote();
-            TransferOutputFilesFromRemoteMachine("/home/training/FromTheTweet/output/part-r-00000", null);
+            TransferOutputFilesFromRemoteMachine("/home/training/FromTheTweet/output/part-r-00000", OUTPUT_FILE);
         }
 
-        public void TransferDirectoryToCloudera(string path)
+        private void TransferTweetsFilesToRemote(string IMPORT_FOLDER)
         {
-            // Sending the the weblogs
-            // TODO: changre the matod to move the tweets file
-            foreach (string file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
+            // Sending the the tweets
+            var tweetsFiles = Directory.GetFiles(IMPORT_FOLDER);
+
+            //string[] fileNames = Directory.GetFiles(JAVA_FILE_FOLDER, "*.java")
+            //                .Select(path => Path.GetFileName(path))
+            //                .ToArray();
+
+            // remove exsisting files 
+            SshManager.ExecuteSingleCommand("rm -r /home/training/FromTheTweet/input/*");
+
+            for (int i = 0; i < tweetsFiles.Length; i++)
             {
-                var fileName = file.Split('\\')[6];
-                var directoryName = file.Split('\\')[5] + "/";
-                SshManager.TransferFileToMachine(file, "/home/training/FromTheTweet/" + directoryName + fileName);
+                SshManager.TransferFileToMachine(tweetsFiles[i], "/home/training/FromTheTweet/input" + tweetsFiles[i].Substring(tweetsFiles[i].LastIndexOf("\\")));
             }
+
         }
 
 
-        public void TransferWebLogFilesToRemote(string filesPath)
+        private void sendJavaFiles(string JAVA_FILE_FOLDER)
         {
-            // Sending the the weblogs
-            // TODO: changre the matod to move the tweets file
-            var webLogsFiles = Directory.GetFiles(Globals.IMPORT_FOLDER);
-            // TODO: changre the matod to move the tweets file
             // Sending the javafiles
-            var javaFiles = Directory.GetFiles(Globals.JAVA_FILE_FOLDER);
-            string[] fileNames = Directory.GetFiles(Globals.JAVA_FILE_FOLDER, "*.java")
-                                     .Select(path => Path.GetFileName(path))
-                                     .ToArray();
+            var javaFiles = Directory.GetFiles(JAVA_FILE_FOLDER);
+            //string[] fileNames = Directory.GetFiles(JAVA_FILE_FOLDER, "*.java")
+            //                 .Select(path => Path.GetFileName(path))
+            //                 .ToArray();
 
             for (int i = 0; i < javaFiles.Length; i++)
             {
-                SshManager.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/" + fileNames[i]);
-
+                SshManager.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/javafiles" + javaFiles[i].Substring(javaFiles[i].LastIndexOf("\\")));
             }
         }
 
-        private void CompilingJavaFilesOnRemote()
+
+        private bool CompilingJavaFilesOnRemote()
         {
-            SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/");
+            try
+            {
+                SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/");
 
-            // Moving the class files to main folder - solving some isues
-            SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
+                // Moving the class files to main folder - solving some isues
+                SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
 
-            // Compiling the javafiles - Making class files
-            SshManager.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d /home/training/FromTheTweet/ /home/training/FromTheTweet/*.java");
+                // Compiling the javafiles - Making class files
+                SshManager.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d /home/training/FromTheTweet/ /home/training/FromTheTweet/*.java");
 
-            // Creating the jar
-            SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && jar -cvf  /home/training/FromTheTweet/FromTheTweet.jar -c solution/*.class;");
+                // Creating the jar
+                SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && jar -cvf  /home/training/FromTheTweet/FromTheTweet.jar -c solution/*.class;");
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void RunHadoopOnRemote()
@@ -100,5 +117,6 @@ namespace Hadoop
         {
             SshManager.TransferFileFromMachine(remoteFile, localPath);
         }
+
     }
 }
