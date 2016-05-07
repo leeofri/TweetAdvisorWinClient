@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using Hadoop;
 using System.IO;
 using BO;
-using StockReader;
 
 namespace StockAnalyzer.Site.Controllers
 {
@@ -23,12 +22,7 @@ namespace StockAnalyzer.Site.Controllers
 
         public object Get([FromUri] UserOptions UserOptions)
         {
-            StockManager stockReader = new StockReader.StockManager();
-            var stocks = stockReader.MakeInputStocksFile(UserOptions.StocksNumber, UserOptions.DaysNumber);
-
-            var businessDays = stocks[0].Days.Count;
-
-            CreateUserConfigFile(UserOptions, businessDays);
+            //CreateUserConfigFile(UserOptions, 2);
 
             hadoop.Run();
 
@@ -36,8 +30,7 @@ namespace StockAnalyzer.Site.Controllers
             Dictionary<string, List<String>> importedFileContent = 
                 ReadingImportedFileAndCluserTheLines(IMPORT_FOLDER);
 
-            return Clustering(stocks, importedFileContent); 
-
+            return null;
         }
 
         private Dictionary<string, List<string>> ReadingImportedFileAndCluserTheLines(string path)
@@ -76,35 +69,6 @@ namespace StockAnalyzer.Site.Controllers
             }
 
             return final;
-        }
-
-        private object Clustering(List<Stock> stocks, Dictionary<string, List<String>> importedFileContent)
-        {
-
-            var clusteredStocks = new List<Cluster>();
-
-            foreach (var currClusterName in importedFileContent.Keys)
-            {
-                var currCluster = new Cluster(currClusterName);
-                foreach (var currStockName in importedFileContent[currClusterName])
-                {
-                    try
-                    {
-                        var currStock = stocks.Where(x => x.Name == currStockName).First();
-                        currCluster.Stocks.Add(currStock);
-                    }
-                    catch (Exception)
-                    {
-
-                      
-                    }
-                   
-                }
-
-                clusteredStocks.Add(currCluster);
-            }
-
-            return clusteredStocks;
         }
 
         private void CreateUserConfigFile(UserOptions userOptions, int businessDays)
