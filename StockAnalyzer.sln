@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSHWrapper", "SshControl\SSHWrapper.csproj", "{857DD4E6-A706-45CF-9056-7DE48B4B978D}"
 EndProject
@@ -23,6 +23,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BO", "BO\BO.csproj", "{B583028D-A7E4-40A4-9C79-6A35D2D533C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandidateReader", "CandidateReader\CandidateReader.csproj", "{9230CB2B-EEDE-4B81-878A-086CD8C19001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvokeHadoop", "InvokeHadoop\InvokeHadoop.csproj", "{92CCF50A-9884-4781-BD7A-78903ECF139C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +56,10 @@ Global
 		{9230CB2B-EEDE-4B81-878A-086CD8C19001}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9230CB2B-EEDE-4B81-878A-086CD8C19001}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9230CB2B-EEDE-4B81-878A-086CD8C19001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92CCF50A-9884-4781-BD7A-78903ECF139C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92CCF50A-9884-4781-BD7A-78903ECF139C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92CCF50A-9884-4781-BD7A-78903ECF139C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92CCF50A-9884-4781-BD7A-78903ECF139C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,5 +69,6 @@ Global
 		{D27CF69D-4681-492A-BE4D-D3D209104423} = {778D7340-2743-46F3-ACAA-5196393EDA39}
 		{CEEB3E6B-0B8A-4BCF-9132-3D2D7086ABC2} = {3531539F-DB2A-4192-A531-C89AE701BB3A}
 		{9230CB2B-EEDE-4B81-878A-086CD8C19001} = {3531539F-DB2A-4192-A531-C89AE701BB3A}
+		{92CCF50A-9884-4781-BD7A-78903ECF139C} = {778D7340-2743-46F3-ACAA-5196393EDA39}
 	EndGlobalSection
 EndGlobal
