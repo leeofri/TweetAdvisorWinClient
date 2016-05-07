@@ -36,21 +36,40 @@ namespace StockAnalyzer.Site.Controllers
             //return sb.ToString();
         }
 
-        private string ProcessFile(string FilePath)
+        private CandidateResult[] ProcessFile(string FilePath)
         {
-            StringBuilder sb = new StringBuilder();
+            
             string[] allLines = File.ReadAllLines(FilePath);
+            string[] currCandidateLine;
+            int currCandidateEnum = 0;
+            int candidateID = -1;
+            int candidateResult = 999;
+
+            CandidateResult[] candidatesResults = new CandidateResult[allLines.Length];
+
             foreach (string item in allLines)
             {
-                sb.Append(item);
-                sb.Append("@");
+                currCandidateLine = item.Split(';');
+                candidatesResults[currCandidateEnum] = new CandidateResult();
+
+                int.TryParse(currCandidateLine[0], out candidateID);
+                int.TryParse(currCandidateLine[1], out candidateResult);
+                candidatesResults[currCandidateEnum].ID = candidateID;
+                candidatesResults[currCandidateEnum].Result = candidateResult;
+
+                currCandidateEnum++;
+       
             }
-            return sb.ToString();
+            return candidatesResults;
         }
 
         public object Get([FromUri] CandidateData CandidateData)
         {
-            string resultString = string.Empty;
+            // Uses to save the results for given day
+            CandidateResult[] currCandidateResult;
+
+            // Uses to return the full results of all candidates and days
+            FullResult[] fullResults;
             int currDate;
             string currFile;
 
@@ -71,16 +90,20 @@ namespace StockAnalyzer.Site.Controllers
             // string endDateText = ConvertDate(CandidateData.endDate);
             int.TryParse(endDateText , out endDate);
 
-            StringBuilder sb = new StringBuilder();
-
             string[] fileEntries = Directory.GetFiles(IMPORT_FOLDER);
 
             // We have only one day
             if (startDate == endDate)
             {
+                // We only have one day
+                fullResults = new FullResult[0];
+                
                 if (File.Exists(IMPORT_FOLDER + startDateText))
                 {
-                    resultString = ProcessFile(IMPORT_FOLDER + startDateText);
+                    // Process the single file and insert the data into the result
+                    currCandidateResult = ProcessFile(IMPORT_FOLDER + startDateText);
+                    fullResults[0].CandidatesResults = currCandidateResult;
+                    fullResults[0].PredictionDate = CandidateData.startDate;
                 }
             }
 
@@ -94,17 +117,15 @@ namespace StockAnalyzer.Site.Controllers
                     currFile = IMPORT_FOLDER + "\\" + currDate + ".txt";
                     if (File.Exists(currFile))
                     {
-                        sb.Append(currDate.ToString());
-                        sb.Append(";");
-                        sb.Append(ProcessFile(currFile));
-                        sb.Append("&");
+                        //candidatesResults
+                        //sb.Append(ProcessFile(currFile));
+                        
                         currDate++;
                     }
                 }
-                resultString = sb.ToString();
             }
 
-            return resultString;
+            return null;
 
             /*
             StockManager stockReader = new StockReader.StockManager();
