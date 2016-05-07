@@ -1,5 +1,0 @@
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateMngr\bin\Debug\CandidateMngr.dll
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateMngr\bin\Debug\CandidateMngr.pdb
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateMngr\obj\Debug\CandidateMngr.csprojResolveAssemblyReference.cache
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateMngr\obj\Debug\CandidateMngr.dll
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateMngr\obj\Debug\CandidateMngr.pdb

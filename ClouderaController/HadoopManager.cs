@@ -1,39 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using SSHWrapper;
-using System.Configuration;
 using System.IO;
+using BO;
 
 namespace Hadoop
 {
     // hadoop class
     public class HadoopManager
     {
-        const string JavaFilesPathOnMachine = @"C:\Users\Matan\Desktop\BigDataCourse\Task3\JavaFiles";
-        const string WebLogsPathOnMacine = @"C:\Users\Matan\Desktop\BigDataCourse\Task3\Web_logs";
-
-        const string EXPORT_FOLDER = @"C:\Users\Matan\Desktop\ExportFiles\";
-        const string IMPORT_FOLDER = @"C:\Users\Matan\Desktop\ImportFiles\output.txt";
-
         public void Run()
-        {
-            TransferDirectoryToCloudera(EXPORT_FOLDER);
+        {   
+            TransferDirectoryToCloudera(Globals.JAVA_FILE_FOLDER);
             CompilingJavaFilesOnRemote();
             RunHadoopOnRemote();
-             TransferOutputFilesFromRemoteMachine("/home/training/finalrun/output/part-r-00000", IMPORT_FOLDER);
+            TransferOutputFilesFromRemoteMachine("/home/training/FromTheTweet/output/part-r-00000", null);
         }
 
         public void TransferDirectoryToCloudera(string path)
         {
             // Sending the the weblogs
+            // TODO: changre the matod to move the tweets file
             foreach (string file in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
             {
                 var fileName = file.Split('\\')[6];
                 var directoryName = file.Split('\\')[5] + "/";
-                SshManager.TransferFileToMachine(file, "/home/training/finalrun/" + directoryName + fileName);
+                SshManager.TransferFileToMachine(file, "/home/training/FromTheTweet/" + directoryName + fileName);
             }
         }
 
@@ -41,78 +32,68 @@ namespace Hadoop
         public void TransferWebLogFilesToRemote(string filesPath)
         {
             // Sending the the weblogs
-            var webLogsFiles = Directory.GetFiles(@"C:\Users\Matan\Desktop\BigDataCourse\Task3\Web_logs");
-
-            for (int i = 0; i < webLogsFiles.Length; i++)
-            {
-
-                SshManager.TransferFileToMachine(webLogsFiles[i], "/home/training/ex4run/WebLogs/" + "Log" + i + ".txt");
-            }
-        }
-
-        private void TransferJavaFilesToRemote(string javaFilePath)
-        {
-            // Adding the files to hadoop hdfs
-
+            // TODO: changre the matod to move the tweets file
+            var webLogsFiles = Directory.GetFiles(Globals.IMPORT_FOLDER);
+            // TODO: changre the matod to move the tweets file
             // Sending the javafiles
-            var javaFiles = Directory.GetFiles(@"C:\Users\Matan\Desktop\BigDataCourse\Task3\JavaFiles");
-            string[] fileNames = Directory.GetFiles(@"C:\Users\Matan\Desktop\BigDataCourse\Task3\JavaFiles", "*.java")
+            var javaFiles = Directory.GetFiles(Globals.JAVA_FILE_FOLDER);
+            string[] fileNames = Directory.GetFiles(Globals.JAVA_FILE_FOLDER, "*.java")
                                      .Select(path => Path.GetFileName(path))
                                      .ToArray();
 
             for (int i = 0; i < javaFiles.Length; i++)
             {
-                SshManager.TransferFileToMachine(javaFiles[i], "/home/training/ex4run/" + fileNames[i]);
+                SshManager.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/" + fileNames[i]);
 
             }
         }
 
         private void CompilingJavaFilesOnRemote()
         {
-            SshManager.ExecuteSingleCommand("cd /home/training/finalrun/");
+            SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/");
 
             // Moving the class files to main folder - solving some isues
-            SshManager.ExecuteSingleCommand("cd /home/training/finalrun/ && cp -r javafiles/* ./");
+            SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
 
             // Compiling the javafiles - Making class files
-            SshManager.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d /home/training/finalrun/ /home/training/finalrun/*.java");
+            SshManager.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d /home/training/FromTheTweet/ /home/training/FromTheTweet/*.java");
 
             // Creating the jar
-            SshManager.ExecuteSingleCommand("cd /home/training/finalrun/ && jar -cvf  /home/training/finalrun/StackAnalyzer.jar -c solution/*.class;");
+            SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && jar -cvf  /home/training/FromTheTweet/FromTheTweet.jar -c solution/*.class;");
         }
 
         private void RunHadoopOnRemote()
         {
-            SshManager.ExecuteSingleCommand("rm -f /home/training/finalrun/output/part-r-00000");
+            SshManager.ExecuteSingleCommand("rm -f /home/training/FromTheTweet/output/part-r-00000");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm finalrun/input/input");
+            SshManager.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/input/input");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm finalrun/data/SequenceFile.canopyCenters");
+            SshManager.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/data/SequenceFile.canopyCenters");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm finalrun/data/SequenceFile.kmeansCenters");
+            SshManager.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/data/SequenceFile.kmeansCenters");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm -r finalrun/output");
+            SshManager.ExecuteSingleCommand("hadoop fs -rm -r FromTheTweet/output");
 
             // Making all the folders
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir finalrun");
+            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir finalrun/input");
+            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/input");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir finalrun/data");
+            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/data");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir finalrun/output");
+            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/output");
 
             //Upload files to hadoop HDFS
-            SshManager.ExecuteSingleCommand("hadoop fs -copyFromLocal /home/training/finalrun/input/input finalrun/input/");
+            SshManager.ExecuteSingleCommand("hadoop fs -copyFromLocal /home/training/FromTheTweet/input/input finalrun/input/");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -copyFromLocal /home/training/finalrun/data/userConfigFile.config finalrun/data/");
+            SshManager.ExecuteSingleCommand("hadoop fs -copyFromLocal /home/training/FromTheTweet/data/userConfigFile.config finalrun/data/");
 
             // Running the map reduce function from the jar
-            SshManager.ExecuteSingleCommand("hadoop jar /home/training/finalrun/StackAnalyzer.jar solution.FinalProj /user/training/finalrun/input/* /user/training/finalrun/output/");
+            SshManager.ExecuteSingleCommand("hadoop jar /home/training/FromTheTweet/FromTheTweet.jar solution.FromTheTweet /user/training/FromTheTweet/input/* /user/training/FromTheTweet/output/");
 
 
             // Handle output
-            SshManager.ExecuteSingleCommand("hadoop fs -get /user/training/finalrun/output/Kmeans0/part-r-00000  /home/training/finalrun/output/part-r-00000");
+            SshManager.ExecuteSingleCommand("hadoop fs -get /user/training/FromTheTweet/output/Kmeans0/part-r-00000  /home/training/FromTheTweet/output/part-r-00000");
         }
 
         private void TransferOutputFilesFromRemoteMachine(string remoteFile, string localPath)

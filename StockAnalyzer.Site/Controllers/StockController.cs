@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,7 +11,6 @@ using Newtonsoft.Json.Linq;
 using Hadoop;
 using System.IO;
 using BO;
-using StockReader;
 using System.Text;
 
 namespace StockAnalyzer.Site.Controllers
@@ -36,24 +36,26 @@ namespace StockAnalyzer.Site.Controllers
             //return sb.ToString();
         }
 
-        private CandidateResult[] ProcessFile(string FilePath)
+        // Input : Formatted file in given path
+        // Output :  Array of the candidates id and result 
+        private CandidatesResult[] ProcessFile(string FilePath)
         {
             
             string[] allLines = File.ReadAllLines(FilePath);
             string[] currCandidateLine;
             int currCandidateEnum = 0;
             int candidateID = -1;
-            int candidateResult = 999;
+            float candidateResult = 9.9F;
 
-            CandidateResult[] candidatesResults = new CandidateResult[allLines.Length];
+            CandidatesResult[] candidatesResults = new CandidatesResult[allLines.Length];
 
             foreach (string item in allLines)
             {
                 currCandidateLine = item.Split(';');
-                candidatesResults[currCandidateEnum] = new CandidateResult();
+                candidatesResults[currCandidateEnum] = new CandidatesResult();
 
                 int.TryParse(currCandidateLine[0], out candidateID);
-                int.TryParse(currCandidateLine[1], out candidateResult);
+                float.TryParse(currCandidateLine[1], out candidateResult);
                 candidatesResults[currCandidateEnum].ID = candidateID;
                 candidatesResults[currCandidateEnum].Result = candidateResult;
 
@@ -66,29 +68,30 @@ namespace StockAnalyzer.Site.Controllers
         public object Get([FromUri] CandidateData CandidateData)
         {
             // Uses to save the results for given day
-            CandidateResult[] currCandidateResult;
+            CandidatesResult[] currCandidateResult;
 
             // Uses to return the full results of all candidates and days
             FullResult[] fullResults;
+
+            //CreateUserConfigFile(UserOptions, 2);
+
             int currDate;
             string currFile;
-
-
+            
             DateTime tempStartDate = new DateTime(2016, 5, 1);              // TODO : remove
             DateTime tempEndDate = new DateTime(2016, 5, 5);                // TODO : remove
-
 
             // Convert the dates to text
             int startDate = 0;
 
             string startDateText = ConvertDate(tempStartDate);              // TODO : remove
             // string startDateText = ConvertDate(CandidateData.startDate);
-            int.TryParse(startDateText,out startDate);
+            int.TryParse(startDateText, out startDate);
 
             int endDate = 0;
             string endDateText = ConvertDate(tempEndDate);                  // TODO : remove
             // string endDateText = ConvertDate(CandidateData.endDate);
-            int.TryParse(endDateText , out endDate);
+            int.TryParse(endDateText, out endDate);
 
             string[] fileEntries = Directory.GetFiles(IMPORT_FOLDER);
 
@@ -110,39 +113,33 @@ namespace StockAnalyzer.Site.Controllers
             // we need to iterate over files
             else
             {
+                int candidateEnum = 0;
+                DateTime formattedDate = new DateTime();
                 currDate = startDate;
+                fullResults = new FullResult[fileEntries.Length];
+
                 foreach (string fileName in fileEntries)
                 {
-                    
+
                     currFile = IMPORT_FOLDER + "\\" + currDate + ".txt";
                     if (File.Exists(currFile))
                     {
-                        //candidatesResults
-                        //sb.Append(ProcessFile(currFile));
-                        
+                        currCandidateResult = ProcessFile(currFile);
+                        fullResults[candidateEnum] = new FullResult();
+                        fullResults[candidateEnum].CandidatesResults = currCandidateResult;
+
+                           
+                        formattedDate = DateTime.ParseExact(currDate.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture);
+                        fullResults[candidateEnum].PredictionDate = formattedDate;
+
+                        // Increase the date and the enum
+                        candidateEnum++;
                         currDate++;
                     }
                 }
             }
 
-            return null;
-
-            /*
-            StockManager stockReader = new StockReader.StockManager();
-            var stocks = stockReader.MakeInputStocksFile(UserOptions.StocksNumber, UserOptions.DaysNumber);
-
-            var businessDays = stocks[0].Days.Count;
-
-            CreateUserConfigFile(UserOptions, businessDays);
-
-            hadoop.Run();
-
-            // Reading the imported file - and clustering the stocks acordingly
-            Dictionary<string, List<String>> importedFileContent = 
-                ReadingImportedFileAndCluserTheLines(IMPORT_FOLDER);
-
-            return Clustering(stocks, importedFileContent); 
-            */
+            return fullResults;
         }
 
         private Dictionary<string, List<string>> ReadingImportedFileAndCluserTheLines(string path)
@@ -181,35 +178,6 @@ namespace StockAnalyzer.Site.Controllers
             }
 
             return final;
-        }
-
-        private object Clustering(List<Stock> stocks, Dictionary<string, List<String>> importedFileContent)
-        {
-
-            var clusteredStocks = new List<Cluster>();
-
-            foreach (var currClusterName in importedFileContent.Keys)
-            {
-                var currCluster = new Cluster(currClusterName);
-                foreach (var currStockName in importedFileContent[currClusterName])
-                {
-                    try
-                    {
-                        var currStock = stocks.Where(x => x.Name == currStockName).First();
-                        currCluster.Stocks.Add(currStock);
-                    }
-                    catch (Exception)
-                    {
-
-                      
-                    }
-                   
-                }
-
-                clusteredStocks.Add(currCluster);
-            }
-
-            return clusteredStocks;
         }
 
         private void CreateUserConfigFile(UserOptions userOptions, int businessDays)

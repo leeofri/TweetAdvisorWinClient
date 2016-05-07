@@ -1,5 +1,0 @@
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateReader\bin\Debug\CandidateReader.dll
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateReader\bin\Debug\CandidateReader.pdb
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateReader\obj\Debug\CandidateReader.csprojResolveAssemblyReference.cache
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateReader\obj\Debug\CandidateReader.dll
-C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\CandidateReader\obj\Debug\CandidateReader.pdb

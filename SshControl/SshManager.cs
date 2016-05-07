@@ -12,7 +12,7 @@ namespace SSHWrapper
     {
         static string USER_NAME = "training";
         static string PASSWORD = "training";
-        static string MACHINE_IP = "192.168.59.131";
+        static string MACHINE_IP = "192.168.196.128";
 
         public static void MakeNewDirectory(string dirName)
         {
