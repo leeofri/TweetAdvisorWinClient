@@ -22,23 +22,29 @@ namespace StockAnalyzer.Site.Models
     }
     public class CandidateData
     {
-        public DateTime startDate { get; set; }
+        public string startDate { get; set; }
 
-        public DateTime endDate { get; set; }
+        public string endDate { get; set; }
 
     }
 
-    public class CandidatesResult
+    public class DayResult
     {
-        public int ID { get; set; }
+        public float HC { get; set; }
 
-        public float Result { get; set; }
+        public float DT { get; set; }
+
+        public float TC { get; set; }
+
+        public float BS { get; set; }
+
+        public float JK { get; set; }
+
+        public string PredictionDate { get; set; }
     }
 
     public class FullResult
     {
-        public CandidatesResult[] CandidatesResults { get; set; }
-
-        public DateTime PredictionDate { get; set; }
+        public DayResult[] CandidatesResults { get; set; }
     }
 }

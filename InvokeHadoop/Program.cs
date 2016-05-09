@@ -12,7 +12,7 @@ namespace InvokeHadoop
     class Program
     {
         private static string logPath = @"./log.txt";
-        private static string configPath = @"./config.xml";
+        private static string configPath = @"../../config.xml";
 
         public static void Main()
         {
