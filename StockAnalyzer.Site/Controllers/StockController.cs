@@ -107,10 +107,10 @@ namespace StockAnalyzer.Site.Controllers
                 // We only have one day
                 result = new DayResult[1];
                 
-                if (File.Exists(IMPORT_FOLDER + startDate.ToString("yyyyMMdd")))
+                if (File.Exists(IMPORT_FOLDER + "\\" + startDate.ToString("yyyyMMdd") + ".txt"))
                 {
                     // Process the single file and insert the data into the result
-                    currCandidateResult = ProcessFile(IMPORT_FOLDER + startDate.ToString("yyyyMMdd"));
+                    currCandidateResult = ProcessFile(IMPORT_FOLDER + "\\" + startDate.ToString("yyyyMMdd") + ".txt");
                     currCandidateResult.PredictionDate = CandidateData.startDate;
                     result[0] = currCandidateResult;
                 }
