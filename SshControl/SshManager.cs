@@ -21,7 +21,7 @@ namespace SSHWrapper
             using (SshStream ssh = new SshStream(MACHINE_IP, USER_NAME, PASSWORD))
             {
                 //writing to the ssh channel
-                ssh.Write("mkdir " + dirName);
+                ssh.Write("mkdir -p " + dirName);
             }
         }
 

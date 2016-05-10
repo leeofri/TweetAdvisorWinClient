@@ -44,13 +44,22 @@ namespace Hadoop
         private void sendJavaFiles(string JAVA_FILE_FOLDER)
         {
             // Sending the javafiles
-            var javaFiles = Directory.GetFiles(JAVA_FILE_FOLDER);
+            var javaFiles = Directory.GetFiles(JAVA_FILE_FOLDER,"*",SearchOption.AllDirectories);
             //string[] fileNames = Directory.GetFiles(JAVA_FILE_FOLDER, "*.java")
             //                 .Select(path => Path.GetFileName(path))
-            //                 .ToArray();
+            //.ToArray();
+
+
+            // init the envuerment
+            SshManager.ExecuteSingleCommand("rm -r -f /home/training/FromTheTweet/javafiles");
+            SshManager.ExecuteSingleCommand("mkdir -p /home/training/FromTheTweet/javafiles");
 
             for (int i = 0; i < javaFiles.Length; i++)
             {
+                // with full path as name
+                //SshManager.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/javafiles" + javaFiles[i].Substring(javaFiles[i].IndexOf(JAVA_FILE_FOLDER) + JAVA_FILE_FOLDER.Length));
+
+                // all file to onr folder
                 SshManager.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/javafiles" + javaFiles[i].Substring(javaFiles[i].LastIndexOf("\\")));
             }
         }
@@ -60,13 +69,11 @@ namespace Hadoop
         {
             try
             {
-                SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/");
-
                 // Moving the class files to main folder - solving some isues
-                SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
+                //SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
 
                 // Compiling the javafiles - Making class files
-                SshManager.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d /home/training/FromTheTweet/ /home/training/FromTheTweet/*.java");
+                SshManager.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d /home/training/FromTheTweet/javafiles /home/training/FromTheTweet/*.java");
 
                 // Creating the jar
                 SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && jar -cvf  /home/training/FromTheTweet/FromTheTweet.jar -c solution/*.class;");

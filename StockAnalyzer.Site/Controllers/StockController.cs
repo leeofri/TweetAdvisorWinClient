@@ -21,8 +21,6 @@ namespace StockAnalyzer.Site.Controllers
         const string USER_CONFIG_FILE_PATH = @"C:\Users\Matan\Desktop\ExportFiles\data\userConfigFile.config";
         const string IMPORT_FOLDER = @"C:\Users\Zvika\Dev\final_proj\FileSamples";
 
- //       HadoopManager hadoop = new HadoopManager();
-
         private string ConvertDate(DateTime currDate)
         {
             return currDate.ToString("yyyyMMdd");
@@ -79,6 +77,8 @@ namespace StockAnalyzer.Site.Controllers
         {
 
             // Lee test
+            HadoopManager hadoop = new HadoopManager();
+            hadoop.init(@"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\JavaCode");
             //hadoop.init(System.Configuration.ConfigurationManager.AppSettings["javaFilePath"]);
 
             // Uses to save the results for given day
