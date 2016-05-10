@@ -68,7 +68,7 @@ namespace StockAnalyzer.Site.Controllers
         {
 
             // Lee test
-            hadoop.init(System.Configuration.ConfigurationManager.AppSettings["javaFilePath"]);
+            hadoop.init(@"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\JavaCode");
 
             // Uses to save the results for given day
             CandidatesResult[] currCandidateResult;
