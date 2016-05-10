@@ -1,0 +1,5 @@
+<config>
+	<java_dir>C:\Users\Zvika\Documents\Visual Studio 2015\Projects\InvokeBigData\InvokeBigData\bin\Debug\java</java_dir>
+	<tweets_dir>C:\Users\Zvika\Documents\Visual Studio 2015\Projects\InvokeBigData\InvokeBigData\bin\Debug\tweets</tweets_dir>
+	<results_dir>C:\Users\Zvika\Documents\Visual Studio 2015\Projects\InvokeBigData\InvokeBigData\bin\Debug\results</results_dir>
+</config>

@@ -19,9 +19,7 @@ namespace StockAnalyzer.Site.Controllers
     public class StockController : ApiController
     {
         const string USER_CONFIG_FILE_PATH = @"C:\Users\Matan\Desktop\ExportFiles\data\userConfigFile.config";
-        const string IMPORT_FOLDER = @"C:\Shahaf\FinalProj\Honey\TweetAdvisorWinClient\FileSamples";
-
-        HadoopManager hadoop = new HadoopManager();
+        const string IMPORT_FOLDER = @"C:\Users\Zvika\Dev\final_proj\FileSamples";
 
         private string ConvertDate(DateTime currDate)
         {
@@ -37,65 +35,69 @@ namespace StockAnalyzer.Site.Controllers
 
         // Input : Formatted file in given path
         // Output :  Array of the candidates id and result 
-        private CandidatesResult[] ProcessFile(string FilePath)
+        private DayResult ProcessFile(string FilePath)
         {
             
             string[] allLines = File.ReadAllLines(FilePath);
             string[] currCandidateLine;
-            int currCandidateEnum = 0;
-            int candidateID = -1;
             float candidateResult = 9.9F;
 
-            CandidatesResult[] candidatesResults = new CandidatesResult[allLines.Length];
+            DayResult daysResults = new DayResult();
 
             foreach (string item in allLines)
             {
                 currCandidateLine = item.Split(';');
-                candidatesResults[currCandidateEnum] = new CandidatesResult();
 
-                int.TryParse(currCandidateLine[0], out candidateID);
                 float.TryParse(currCandidateLine[1], out candidateResult);
-                candidatesResults[currCandidateEnum].ID = candidateID;
-                candidatesResults[currCandidateEnum].Result = candidateResult;
-
-                currCandidateEnum++;
-       
+                switch (currCandidateLine[0])
+                {
+                    case "HC":
+                        daysResults.HC = candidateResult;
+                        break;
+                    case "DT":
+                        daysResults.DT = candidateResult;
+                        break;
+                    case "TC":
+                        daysResults.TC = candidateResult;
+                        break;
+                    case "BS":
+                        daysResults.BS = candidateResult;
+                        break;
+                    case "JK":
+                        daysResults.JK = candidateResult;
+                        break;
+                    default:
+                        throw new Exception();
+                }
             }
-            return candidatesResults;
+            return daysResults;
         }
 
         public object Get([FromUri] CandidateData CandidateData)
         {
 
             // Lee test
+            HadoopManager hadoop = new HadoopManager();
             hadoop.init(@"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\JavaCode");
+            //hadoop.init(System.Configuration.ConfigurationManager.AppSettings["javaFilePath"]);
 
             // Uses to save the results for given day
-            CandidatesResult[] currCandidateResult;
+            DayResult currCandidateResult;
 
             // Uses to return the full results of all candidates and days
-            FullResult[] fullResults;
+            DayResult[] result;
 
 
             //CreateUserConfigFile(UserOptions, 2);
 
             int currDate;
             string currFile;
-            
-            DateTime tempStartDate = new DateTime(2016, 5, 1);              // TODO : remove
-            DateTime tempEndDate = new DateTime(2016, 5, 5);                // TODO : remove
+            DateTime startDate = Convert.ToDateTime(CandidateData.startDate);              // TODO : remove
+            DateTime endDate = Convert.ToDateTime(CandidateData.endDate);                // TODO : remove
 
             // Convert the dates to text
-            int startDate = 0;
 
-            string startDateText = ConvertDate(tempStartDate);              // TODO : remove
-            // string startDateText = ConvertDate(CandidateData.startDate);
-            int.TryParse(startDateText, out startDate);
-
-            int endDate = 0;
-            string endDateText = ConvertDate(tempEndDate);                  // TODO : remove
-            // string endDateText = ConvertDate(CandidateData.endDate);
-            int.TryParse(endDateText, out endDate);
+           
 
             string[] fileEntries = Directory.GetFiles(IMPORT_FOLDER);
 
@@ -103,14 +105,14 @@ namespace StockAnalyzer.Site.Controllers
             if (startDate == endDate)
             {
                 // We only have one day
-                fullResults = new FullResult[0];
+                result = new DayResult[1];
                 
-                if (File.Exists(IMPORT_FOLDER + startDateText))
+                if (File.Exists(IMPORT_FOLDER + "\\" + startDate.ToString("yyyyMMdd") + ".txt"))
                 {
                     // Process the single file and insert the data into the result
-                    currCandidateResult = ProcessFile(IMPORT_FOLDER + startDateText);
-                    fullResults[0].CandidatesResults = currCandidateResult;
-                    fullResults[0].PredictionDate = CandidateData.startDate;
+                    currCandidateResult = ProcessFile(IMPORT_FOLDER + "\\" + startDate.ToString("yyyyMMdd") + ".txt");
+                    currCandidateResult.PredictionDate = CandidateData.startDate;
+                    result[0] = currCandidateResult;
                 }
             }
 
@@ -118,32 +120,32 @@ namespace StockAnalyzer.Site.Controllers
             else
             {
                 int candidateEnum = 0;
-                DateTime formattedDate = new DateTime();
-                currDate = startDate;
-                fullResults = new FullResult[fileEntries.Length];
+                DateTime curDate = startDate;
+                result = new DayResult[((int)(endDate - startDate).TotalDays + 1)];
 
                 foreach (string fileName in fileEntries)
                 {
 
-                    currFile = IMPORT_FOLDER + "\\" + currDate + ".txt";
+                    currFile = IMPORT_FOLDER + "\\" + curDate.ToString("yyyyMMdd") + ".txt";
                     if (File.Exists(currFile))
                     {
                         currCandidateResult = ProcessFile(currFile);
-                        fullResults[candidateEnum] = new FullResult();
-                        fullResults[candidateEnum].CandidatesResults = currCandidateResult;
+                        result[candidateEnum] = new DayResult();
+                        result[candidateEnum] = currCandidateResult;
 
                            
-                        formattedDate = DateTime.ParseExact(currDate.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture);
-                        fullResults[candidateEnum].PredictionDate = formattedDate;
+                        result[candidateEnum].PredictionDate = curDate.ToString("yyyy-MM-dd");
 
                         // Increase the date and the enum
                         candidateEnum++;
-                        currDate++;
+                        curDate = curDate.AddDays(1);
+                        if (curDate > endDate)
+                            break;
                     }
                 }
             }
 
-            return fullResults;
+            return result;
         }
 
         private Dictionary<string, List<string>> ReadingImportedFileAndCluserTheLines(string path)
