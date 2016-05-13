@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Hadoop;
 using System.IO;
 using System.Xml;
+using SSHWrapper;
 
 namespace InvokeHadoop
 {
@@ -41,7 +42,7 @@ namespace InvokeHadoop
             }
             else
             {
-                HadoopManager hadoop = new HadoopManager();
+                HadoopManager hadoop = new HadoopManager(new SshManager("192.168.196.128", "training", "training"));
 
                 if (!hadoop.init(javaDir))
                 {

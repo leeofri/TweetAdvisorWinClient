@@ -10,27 +10,34 @@ namespace SSHWrapper
 {
     public class SshManager
     {
-        static string USER_NAME = "training";
-        static string PASSWORD = "training";
-        static string MACHINE_IP = "192.168.196.128";
+        private string username;
+        private string password;
+        private string machine_ip;
 
-        public static void MakeNewDirectory(string dirName)
+        public SshManager(string ip, string username, string password)
+        {
+            this.username = username;
+            this.password = password;
+            this.machine_ip = ip;
+        }
+
+        public void MakeNewDirectory(string dirName)
         {
 
             //create a new ssh stream
-            using (SshStream ssh = new SshStream(MACHINE_IP, USER_NAME, PASSWORD))
+            using (SshStream ssh = new SshStream(this.machine_ip, this.username, this.password))
             {
                 //writing to the ssh channel
                 ssh.Write("mkdir -p " + dirName);
             }
         }
 
-        public static void TransferFileToMachine(string localFilePath, string remoteFilePath)
+        public void TransferFileToMachine(string localFilePath, string remoteFilePath)
         {
             try
             {
                 //Create a new SCP instance
-                Scp scp = new Scp(MACHINE_IP, USER_NAME, PASSWORD);
+                Scp scp = new Scp(machine_ip, username, password);
 
                 scp.Connect();
 
@@ -45,12 +52,12 @@ namespace SSHWrapper
             }
         }
 
-        public static void TransferFileFromMachine(string remoteFile, string localPath)
+        public void TransferFileFromMachine(string remoteFile, string localPath)
         {
             try
             {
                 //Create a new SCP instance
-                Scp scp = new Scp(MACHINE_IP, USER_NAME, PASSWORD);
+                Scp scp = new Scp(machine_ip, username, password);
 
                 scp.Connect();
 
@@ -66,12 +73,12 @@ namespace SSHWrapper
             }
         }
 
-        public static void ExecuteSingleCommand(string command)
+        public void ExecuteSingleCommand(string command)
         {
             try
             {
                 //create a new ssh stream
-                SshExec ssh = new SshExec(MACHINE_IP, USER_NAME, PASSWORD);
+                SshExec ssh = new SshExec(machine_ip, username, password);
 
                 ssh.Connect();
 
@@ -82,7 +89,27 @@ namespace SSHWrapper
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                throw;
+            }
+        }
+
+        public void ExecuteSingleCommand(string command,ref string StdOut,ref string StdErr)
+        {
+            try
+            {
+                //create a new ssh stream
+                SshExec ssh = new SshExec(machine_ip, username, password);
+
+                ssh.Connect();
+
+                //writing to the ssh channel
+                var str = ssh.RunCommand(command,ref StdOut,ref StdErr);
+
+                ssh.Close();
+            }
+            catch (Exception e)
+            {
+                throw;
             }
         }
     }

@@ -337,6 +337,10 @@
       <Project>{ceeb3e6b-0b8a-4bcf-9132-3d2d7086abc2}</Project>
       <Name>Hadoop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SshControl\SSHWrapper.csproj">
+      <Project>{857dd4e6-a706-45cf-9056-7de48b4b978d}</Project>
+      <Name>SSHWrapper</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

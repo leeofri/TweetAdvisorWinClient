@@ -55,6 +55,10 @@
       <Project>{ceeb3e6b-0b8a-4bcf-9132-3d2d7086abc2}</Project>
       <Name>Hadoop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SshControl\SSHWrapper.csproj">
+      <Project>{857DD4E6-A706-45CF-9056-7DE48B4B978D}</Project>
+      <Name>SSHWrapper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

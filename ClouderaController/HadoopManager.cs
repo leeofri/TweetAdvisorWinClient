@@ -7,6 +7,18 @@ namespace Hadoop
     // hadoop class
     public class HadoopManager
     {
+        SshManager SshM;
+
+        // DM
+        public const string BASE_DIR = "/home/training";
+        public const string HDFS_DIR = "/user/training";
+
+
+        public HadoopManager(SshManager s)
+        {
+            this.SshM = s;
+        }
+
         public bool init(string JAVA_FILE_FOLDER)
         {
             sendJavaFiles(JAVA_FILE_FOLDER);
@@ -18,7 +30,7 @@ namespace Hadoop
         {
             TransferTweetsFilesToRemote(INPUT_FILE_PATH);
             RunHadoopOnRemote();
-            TransferOutputFilesFromRemoteMachine("/home/training/FromTheTweet/output/part-r-00000", OUTPUT_FILE);
+            TransferOutputFilesFromRemoteMachine(BASE_DIR+"/FromTheTweet/output/part-r-00000", OUTPUT_FILE);
         }
 
         private void TransferTweetsFilesToRemote(string IMPORT_FOLDER)
@@ -26,18 +38,15 @@ namespace Hadoop
             // Sending the the tweets
             var tweetsFiles = Directory.GetFiles(IMPORT_FOLDER);
 
-            //string[] fileNames = Directory.GetFiles(JAVA_FILE_FOLDER, "*.java")
-            //                .Select(path => Path.GetFileName(path))
-            //                .ToArray();
-
+    
             // remove exsisting files 
-            SshManager.ExecuteSingleCommand("rm -r /home/training/FromTheTweet/input/*");
+            SshM.ExecuteSingleCommand("rm -r "+ BASE_DIR + "/FromTheTweet/input");
+            SshM.ExecuteSingleCommand("mkdir " + BASE_DIR + "/FromTheTweet/input");
 
             for (int i = 0; i < tweetsFiles.Length; i++)
             {
-                SshManager.TransferFileToMachine(tweetsFiles[i], "/home/training/FromTheTweet/input" + tweetsFiles[i].Substring(tweetsFiles[i].LastIndexOf("\\")));
+                SshM.TransferFileToMachine(tweetsFiles[i], BASE_DIR + "/FromTheTweet/input/" + tweetsFiles[i].Substring(tweetsFiles[i].LastIndexOf("\\") + 1));
             }
-
         }
 
 
@@ -45,22 +54,18 @@ namespace Hadoop
         {
             // Sending the javafiles
             var javaFiles = Directory.GetFiles(JAVA_FILE_FOLDER,"*",SearchOption.AllDirectories);
-            //string[] fileNames = Directory.GetFiles(JAVA_FILE_FOLDER, "*.java")
-            //                 .Select(path => Path.GetFileName(path))
-            //.ToArray();
-
 
             // init the envuerment
-            SshManager.ExecuteSingleCommand("rm -r -f /home/training/FromTheTweet/javafiles");
-            SshManager.ExecuteSingleCommand("mkdir -p /home/training/FromTheTweet/javafiles");
+            SshM.ExecuteSingleCommand("rm -r -f" + BASE_DIR + "/FromTheTweet/javafiles");
+            SshM.ExecuteSingleCommand("mkdir -p " + BASE_DIR + "/FromTheTweet/javafiles");
 
             for (int i = 0; i < javaFiles.Length; i++)
             {
                 // with full path as name
-                //SshManager.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/javafiles" + javaFiles[i].Substring(javaFiles[i].IndexOf(JAVA_FILE_FOLDER) + JAVA_FILE_FOLDER.Length));
+                //SshM.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/javafiles" + javaFiles[i].Substring(javaFiles[i].IndexOf(JAVA_FILE_FOLDER) + JAVA_FILE_FOLDER.Length));
 
                 // all file to onr folder
-                SshManager.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/javafiles" + javaFiles[i].Substring(javaFiles[i].LastIndexOf("\\")));
+                SshM.TransferFileToMachine(javaFiles[i], BASE_DIR + "/FromTheTweet/javafiles/" + javaFiles[i].Substring(javaFiles[i].LastIndexOf("\\")+1));
             }
         }
 
@@ -70,13 +75,13 @@ namespace Hadoop
             try
             {
                 // Moving the class files to main folder - solving some isues
-                //SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
+                //SshM.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
 
                 // Compiling the javafiles - Making class files
-                SshManager.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d /home/training/FromTheTweet/javafiles /home/training/FromTheTweet/*.java");
+                SshM.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d "+BASE_DIR + "/FromTheTweet "+ BASE_DIR + "/FromTheTweet/javafiles/*.java");
 
                 // Creating the jar
-                SshManager.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && jar -cvf  /home/training/FromTheTweet/FromTheTweet.jar -c solution/*.class;");
+                SshM.ExecuteSingleCommand("cd " + BASE_DIR + "/FromTheTweet && jar -cvf " + BASE_DIR + "/FromTheTweet/FromTheTweet.jar -c solution/*.class;");
             }
             catch
             {
@@ -88,41 +93,45 @@ namespace Hadoop
 
         private void RunHadoopOnRemote()
         {
-            SshManager.ExecuteSingleCommand("rm -f /home/training/FromTheTweet/output/part-r-00000");
+            // logging parameters
+            string StdOut = "", StdErr = "";
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/input/input");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/data/SequenceFile.canopyCenters");
+            SshM.ExecuteSingleCommand("rm -f "+ BASE_DIR + "/FromTheTweet/output/part-r-00000");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/data/SequenceFile.kmeansCenters");
+            SshM.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/input");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -rm -r FromTheTweet/output");
+            SshM.ExecuteSingleCommand("hadoop fs -rm -r FromTheTweet/output");
 
             // Making all the folders
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet");
+            SshM.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/input");
+            SshM.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/input");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/data");
-
-            SshManager.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/output");
+            SshM.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/data");
 
             //Upload files to hadoop HDFS
-            SshManager.ExecuteSingleCommand("hadoop fs -copyFromLocal /home/training/FromTheTweet/input/input finalrun/input/");
+            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + HDFS_DIR + "/FromTheTweet/input FromTheTweet/input");
 
-            SshManager.ExecuteSingleCommand("hadoop fs -copyFromLocal /home/training/FromTheTweet/data/userConfigFile.config finalrun/data/");
+            //Upload word dic to hadoop HDFS
+            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + HDFS_DIR + "/FromTheTweet/javafiles/wordDictionary.txt FromTheTweet");
 
             // Running the map reduce function from the jar
-            SshManager.ExecuteSingleCommand("hadoop jar /home/training/FromTheTweet/FromTheTweet.jar solution.FromTheTweet /user/training/FromTheTweet/input/* /user/training/FromTheTweet/output/");
+            SshM.ExecuteSingleCommand("hadoop jar " + BASE_DIR + "/FromTheTweet/FromTheTweet.jar solution.FinalProj " + HDFS_DIR + "/FromTheTweet/input/input " + HDFS_DIR + "/FromTheTweet/output",ref StdOut,ref StdErr);
 
+            if (StdErr != "")
+            {
+                //throw new System.Exception(StdErr);
+            }
 
             // Handle output
-            SshManager.ExecuteSingleCommand("hadoop fs -get /user/training/FromTheTweet/output/Kmeans0/part-r-00000  /home/training/FromTheTweet/output/part-r-00000");
+            SshM.ExecuteSingleCommand("mkdir -p " + BASE_DIR + "/FromTheTweet/output");
+            SshM.ExecuteSingleCommand("hadoop fs -get FromTheTweet/output/part-r-00000  " + BASE_DIR + "/FromTheTweet/output/part-r-00000");
         }
 
         private void TransferOutputFilesFromRemoteMachine(string remoteFile, string localPath)
         {
-            SshManager.TransferFileFromMachine(remoteFile, localPath);
+            SshM.TransferFileFromMachine(remoteFile, localPath);
         }
 
     }

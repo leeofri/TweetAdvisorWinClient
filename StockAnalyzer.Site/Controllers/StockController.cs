@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Hadoop;
 using System.IO;
 using System.Text;
+using SSHWrapper;
 
 namespace StockAnalyzer.Site.Controllers
 {
@@ -77,8 +78,9 @@ namespace StockAnalyzer.Site.Controllers
         {
 
             // Lee test
-            HadoopManager hadoop = new HadoopManager();
-            hadoop.init(@"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\JavaCode");
+            //HadoopManager hadoop = new HadoopManager(new SshManager("192.168.196.128", "training", "training"));
+            //hadoop.init(@"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\JavaCode");
+            //hadoop.Run(@"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\Tweets", @"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\Results");
             //hadoop.init(System.Configuration.ConfigurationManager.AppSettings["javaFilePath"]);
 
             // Uses to save the results for given day
