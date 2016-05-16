@@ -12,13 +12,11 @@ namespace InvokeHadoop
 {
     class Program
     {
-        private static string logPath = @"./log.txt";
         private static string configPath = @"../../config.xml";
 
         public static void Main()
         {
-            StreamWriter log = File.AppendText(logPath);
-            Log("starting app", log);
+            Logger.log("starting app");
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(configPath);
@@ -32,13 +30,13 @@ namespace InvokeHadoop
             node = xmlDoc.DocumentElement.SelectSingleNode("/config/results_dir");
             string resultsPath = node.FirstChild.Value + "\\" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
 
-            Log("config loaded", log);
+            Logger.log("config loaded");
 
             DateTime t = DateTime.Now;
 
             if (!Directory.Exists(tweetsDir))
             {
-                Log("tweets dir does not exist, terminating", log);
+                Logger.log("tweets dir does not exist, terminating");
             }
             else
             {
@@ -46,36 +44,25 @@ namespace InvokeHadoop
 
                 if (!hadoop.init(javaDir))
                 {
-                    Log("init failed, terminating", log);
+                    Logger.log("init failed, terminating");
                 }
                 else
                 {
-                    Log("init succeeded", log);
+                    Logger.log("init succeeded");
 
                     try
                     {
                         hadoop.Run(tweetsDir, resultsPath);
-                        Log("hadoop run finished with no exception", log);
+                        Logger.log("hadoop run finished with no exception");
                     }
                     catch (Exception)
                     {
-                        Log("hadoop run failed", log);
+                        Logger.log("hadoop run failed");
                     }
                 }
             }
 
-            Log("app finished", log);
-            log.Close();
-        }
-
-        public static void Log(string logMessage, TextWriter w)
-        {
-            w.Write("\r\nLog Entry : ");
-            w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
-                DateTime.Now.ToLongDateString());
-            w.WriteLine("{0}", logMessage);
-            w.WriteLine("-------------------------------");
-            w.Flush();
+            Logger.log("app finished");
         }
 
     }
