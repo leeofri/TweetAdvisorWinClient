@@ -47,13 +47,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HadoopManager.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BO\BO.csproj">
       <Project>{b583028d-a7e4-40a4-9c79-6a35d2d533c0}</Project>
       <Name>BO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\log\Log.csproj">
+      <Project>{e2bb038c-ee4e-46f0-9880-e372c7d7ef14}</Project>
+      <Name>Log</Name>
     </ProjectReference>
     <ProjectReference Include="..\SshControl\SSHWrapper.csproj">
       <Project>{857dd4e6-a706-45cf-9056-7de48b4b978d}</Project>

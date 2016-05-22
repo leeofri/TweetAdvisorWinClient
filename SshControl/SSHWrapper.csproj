@@ -64,6 +64,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\log\Log.csproj">
+      <Project>{E2BB038C-EE4E-46F0-9880-E372C7D7EF14}</Project>
+      <Name>Log</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SharpSSH\SharpSSH.csproj">
       <Project>{d27cf69d-4681-492a-be4d-d3d209104423}</Project>
       <Name>SharpSSH</Name>

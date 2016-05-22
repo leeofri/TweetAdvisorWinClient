@@ -1,7 +1,7 @@
 ﻿using SSHWrapper;
 using System.IO;
 using System.Linq;
-
+using Logger;
 namespace Hadoop
 {
     // hadoop class
@@ -99,30 +99,26 @@ namespace Hadoop
 
             SshM.ExecuteSingleCommand("rm -f "+ BASE_DIR + "/FromTheTweet/output/part-r-00000");
 
-            SshM.ExecuteSingleCommand("hadoop fs -rm FromTheTweet/input");
-
-            SshM.ExecuteSingleCommand("hadoop fs -rm -r FromTheTweet/output");
+            SshM.ExecuteSingleCommand("hadoop fs -rm -r " + HDFS_DIR + "/FromTheTweet");
 
             // Making all the folders
-            SshM.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet");
+            SshM.ExecuteSingleCommand("hadoop fs -mkdir " + HDFS_DIR + "/FromTheTweet");
 
-            SshM.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/input");
+            SshM.ExecuteSingleCommand("hadoop fs -mkdir " + HDFS_DIR + "/FromTheTweet/input");
 
-            SshM.ExecuteSingleCommand("hadoop fs -mkdir FromTheTweet/data");
+            SshM.ExecuteSingleCommand("hadoop fs -mkdir "+HDFS_DIR+"/FromTheTweet/data");
 
             //Upload files to hadoop HDFS
-            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + HDFS_DIR + "/FromTheTweet/input FromTheTweet/input");
+            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + BASE_DIR + "/FromTheTweet/input "+ HDFS_DIR + "/FromTheTweet/input");
 
             //Upload word dic to hadoop HDFS
-            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + HDFS_DIR + "/FromTheTweet/javafiles/wordDictionary.txt FromTheTweet");
+            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + BASE_DIR + "/FromTheTweet/javafiles/wordDictionary.txt " + HDFS_DIR + "/FromTheTweet");
 
             // Running the map reduce function from the jar
             SshM.ExecuteSingleCommand("hadoop jar " + BASE_DIR + "/FromTheTweet/FromTheTweet.jar solution.FinalProj " + HDFS_DIR + "/FromTheTweet/input/input " + HDFS_DIR + "/FromTheTweet/output",ref StdOut,ref StdErr);
 
-            if (StdErr != "")
-            {
-                //throw new System.Exception(StdErr);
-            }
+            // send the hadoop result to the log
+            SLogger.log(StdErr);
 
             // Handle output
             SshM.ExecuteSingleCommand("mkdir -p " + BASE_DIR + "/FromTheTweet/output");

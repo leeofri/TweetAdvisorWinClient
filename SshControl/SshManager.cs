@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Logger;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tamir.SharpSsh;
+
 
 namespace SSHWrapper
 {
@@ -46,8 +48,9 @@ namespace SSHWrapper
 
                 scp.Close();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                SLogger.log("TransferFileToMachine - Exeption Massage:" + ex.Message);
                 throw;
             }
         }
@@ -66,9 +69,9 @@ namespace SSHWrapper
 
                 scp.Close();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                SLogger.log("TransferFileFromMachine - Exeption Massage:" + ex.Message);
                 throw;
             }
         }
@@ -89,6 +92,7 @@ namespace SSHWrapper
             }
             catch (Exception e)
             {
+                SLogger.log("ExecuteSingleCommand - Exeption Massage:" + e.Message);
                 throw;
             }
         }
@@ -109,6 +113,7 @@ namespace SSHWrapper
             }
             catch (Exception e)
             {
+                SLogger.log(" ExecuteSingleCommand(string command,ref string StdOut,ref string StdErr) - Exeption Massage:" + e.Message);
                 throw;
             }
         }

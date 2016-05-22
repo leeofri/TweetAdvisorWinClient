@@ -55,6 +55,10 @@
       <Project>{ceeb3e6b-0b8a-4bcf-9132-3d2d7086abc2}</Project>
       <Name>Hadoop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\log\Log.csproj">
+      <Project>{e2bb038c-ee4e-46f0-9880-e372c7d7ef14}</Project>
+      <Name>Log</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SshControl\SSHWrapper.csproj">
       <Project>{857DD4E6-A706-45CF-9056-7DE48B4B978D}</Project>
       <Name>SSHWrapper</Name>
