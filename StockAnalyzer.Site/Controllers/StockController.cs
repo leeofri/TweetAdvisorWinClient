@@ -20,7 +20,7 @@ namespace StockAnalyzer.Site.Controllers
     public class StockController : ApiController
     {
         const string USER_CONFIG_FILE_PATH = @"C:\Users\Matan\Desktop\ExportFiles\data\userConfigFile.config";
-        const string IMPORT_FOLDER = @"C:\Shahaf\FProj\Result";
+        const string IMPORT_FOLDER = @"C:\Users\Zvika\Dev\final_proj\FileSamples";
 
         private string ConvertDate(DateTime currDate)
         {
@@ -96,10 +96,13 @@ namespace StockAnalyzer.Site.Controllers
             string currFile;
             DateTime startDate = Convert.ToDateTime(CandidateData.startDate);              // TODO : remove
             DateTime endDate = Convert.ToDateTime(CandidateData.endDate);                // TODO : remove
+            DateTime empty = new DateTime(1, 1, 1);
 
             // Convert the dates to text
 
-           
+            if (startDate == empty || endDate == empty)
+                return new DayResult[0];
+
 
             string[] fileEntries = Directory.GetFiles(IMPORT_FOLDER);
 
@@ -125,25 +128,44 @@ namespace StockAnalyzer.Site.Controllers
                 DateTime curDate = startDate;
                 result = new DayResult[((int)(endDate - startDate).TotalDays + 1)];
 
-                foreach (string fileName in fileEntries)
+                while (curDate <= endDate)
                 {
-
                     currFile = IMPORT_FOLDER + "\\" + curDate.ToString("yyyyMMdd") + ".txt";
                     if (File.Exists(currFile))
                     {
                         currCandidateResult = ProcessFile(currFile);
-                        result[candidateEnum] = new DayResult();
                         result[candidateEnum] = currCandidateResult;
 
                            
                         result[candidateEnum].PredictionDate = curDate.ToString("yyyy-MM-dd");
 
                         // Increase the date and the enum
-                        candidateEnum++;
-                        curDate = curDate.AddDays(1);
-                        if (curDate > endDate)
-                            break;
                     }
+                    else
+                    {
+                        if (candidateEnum == 0)
+                        {
+                            result[candidateEnum] = new DayResult();
+                            result[candidateEnum].BS = 0;
+                            result[candidateEnum].DT = 0;
+                            result[candidateEnum].HC = 0;
+                            result[candidateEnum].JK = 0;
+                            result[candidateEnum].TC = 0;
+                        }
+                        else
+                        {
+                            result[candidateEnum] = new DayResult();
+                            result[candidateEnum].BS = result[candidateEnum - 1].BS;
+                            result[candidateEnum].DT = result[candidateEnum - 1].DT;
+                            result[candidateEnum].HC = result[candidateEnum - 1].HC;
+                            result[candidateEnum].JK = result[candidateEnum - 1].JK;
+                            result[candidateEnum].TC = result[candidateEnum - 1].TC;
+                        }
+                        result[candidateEnum].PredictionDate = curDate.ToString("yyyy-MM-dd");
+                    }
+                    curDate = curDate.AddDays(1);
+                    candidateEnum++;
+
                 }
             }
 
