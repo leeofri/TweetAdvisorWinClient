@@ -20,7 +20,7 @@ namespace StockAnalyzer.Site.Controllers
     public class StockController : ApiController
     {
         const string USER_CONFIG_FILE_PATH = @"C:\Users\Matan\Desktop\ExportFiles\data\userConfigFile.config";
-        const string IMPORT_FOLDER = @"C:\Users\Zvika\Dev\final_proj\FileSamples";
+        const string IMPORT_FOLDER = @"C:\Shahaf\FProj\Result";
 
         private string ConvertDate(DateTime currDate)
         {
