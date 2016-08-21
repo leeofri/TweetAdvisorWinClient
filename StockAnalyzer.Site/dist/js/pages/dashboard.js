@@ -123,7 +123,7 @@ $(function () {
     
     function getCandidatesData(startDate, endDate, func){
         $.ajax({
-            url: "http://localhost:63486/api/stock?startDate="+ startDate + "&endDate=" + endDate,
+            url: "http://localhost:63486/api/Tweet?startDate="+ startDate + "&endDate=" + endDate,
             type: "GET",
             crossDomain: true,
             success: function (response) {

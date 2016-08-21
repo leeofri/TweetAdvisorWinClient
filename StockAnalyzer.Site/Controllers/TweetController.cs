@@ -17,7 +17,7 @@ namespace StockAnalyzer.Site.Controllers
 {
    
 
-    public class Controller : ApiController
+    public class TweetController : ApiController
     {
         const string USER_CONFIG_FILE_PATH = @"C:\Users\Matan\Desktop\ExportFiles\data\userConfigFile.config";
         const string IMPORT_FOLDER = @"C:\Shahaf\FProj\Result";
