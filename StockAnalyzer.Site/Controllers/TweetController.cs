@@ -21,17 +21,12 @@ namespace StockAnalyzer.Site.Controllers
     {
         const string USER_CONFIG_FILE_PATH = @"C:\Users\Matan\Desktop\ExportFiles\data\userConfigFile.config";
         const string IMPORT_FOLDER = @"C:\Shahaf\FProj\Result";
+        const string RAW_DATA_FOLDER = @"C:\Shahaf\FProj\RawData";
 
         private string ConvertDate(DateTime currDate)
         {
             return currDate.ToString("yyyyMMdd");
-
-            //StringBuilder sb = new StringBuilder();
-            //sb.Append(currDate.Year);
-            //sb.Append(currDate.Month);
-            //sb.Append(currDate.Day);
-
-            //return sb.ToString();
+                    
         }
 
         // Input : Formatted file in given path
@@ -83,6 +78,10 @@ namespace StockAnalyzer.Site.Controllers
             //hadoop.Run(@"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\Tweets", @"E:\Programming\FromTheTweet\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\Results");
             //hadoop.init(System.Configuration.ConfigurationManager.AppSettings["javaFilePath"]);
 
+            // Get the number of total days to send to the TF-IDF
+            string[] RawDataDays = Directory.GetDirectories(RAW_DATA_FOLDER);
+            int TotalRawDays = RawDataDays.Length;
+            
             // Uses to save the results for given day
             DayResult currCandidateResult;
 
