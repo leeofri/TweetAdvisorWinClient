@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tamir.SharpSsh;
-
+using WinSCP;
 
 namespace SSHWrapper
 {
@@ -117,5 +117,95 @@ namespace SSHWrapper
                 throw;
             }
         }
+
+        public bool TransferFolderToMachine(string localFolderPath, string remoteFolderPath)
+        {
+            try
+            {
+                // Setup session options
+                SessionOptions sessionOptions = new SessionOptions 
+                {
+                    Protocol = Protocol.Scp,
+                    HostName = this.machine_ip,
+                    UserName = this.username,
+                    Password = this.password,
+                };
+
+                using (Session session = new Session())
+                {
+                    // Obtaining host key 
+                    sessionOptions.SshHostKeyFingerprint = session.ScanFingerprint(sessionOptions);
+
+                    // Will continuously report progress of synchronization
+                    session.FileTransferred += FileTransferred;
+
+                    // Connect
+                    session.Open(sessionOptions);
+
+                    // Synchronize files
+                    SynchronizationResult synchronizationResult;
+                    synchronizationResult =
+                        session.SynchronizeDirectories(
+                            SynchronizationMode.Remote, localFolderPath,remoteFolderPath, true,true);
+
+                    // Throw on any error
+                    synchronizationResult.Check();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: {0}", e);
+                return false;
+            }
+        }
+
+
+        private static void FileTransferred(object sender, TransferEventArgs e)
+        {
+            if (e.Error == null)
+            {
+                Console.WriteLine("Upload of {0} succeeded", e.FileName);
+            }
+            else
+            {
+                Console.WriteLine("Upload of {0} failed: {1}", e.FileName, e.Error);
+            }
+
+            if (e.Chmod != null)
+            {
+                if (e.Chmod.Error == null)
+                {
+                    Console.WriteLine("Permisions of {0} set to {1}", e.Chmod.FileName, e.Chmod.FilePermissions);
+                }
+                else
+                {
+                    Console.WriteLine("Setting permissions of {0} failed: {1}", e.Chmod.FileName, e.Chmod.Error);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Permissions of {0} kept with their defaults", e.Destination);
+            }
+
+            if (e.Touch != null)
+            {
+                if (e.Touch.Error == null)
+                {
+                    Console.WriteLine("Timestamp of {0} set to {1}", e.Touch.FileName, e.Touch.LastWriteTime);
+                }
+                else
+                {
+                    Console.WriteLine("Setting timestamp of {0} failed: {1}", e.Touch.FileName, e.Touch.Error);
+                }
+            }
+            else
+            {
+                // This should never happen during "local to remote" synchronization
+                Console.WriteLine("Timestamp of {0} kept with its default (current time)", e.Destination);
+            }
+        }
+
     }
 }

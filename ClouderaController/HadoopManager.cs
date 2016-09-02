@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using Logger;
+using System;
+
 namespace Hadoop
 {
     // hadoop class
@@ -21,9 +23,12 @@ namespace Hadoop
 
         public bool init(string JAVA_FILE_FOLDER)
         {
-            sendJavaFiles(JAVA_FILE_FOLDER);
-            bool result = CompilingJavaFilesOnRemote();
-            return result;
+            if (sendJavaFiles(JAVA_FILE_FOLDER) && CompilingJavaFilesOnRemote())
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public void Run(string INPUT_FILE_PATH,string OUTPUT_FILE)
@@ -50,23 +55,13 @@ namespace Hadoop
         }
 
 
-        private void sendJavaFiles(string JAVA_FILE_FOLDER)
+        private bool sendJavaFiles(string javaFileFolder)
         {
-            // Sending the javafiles
-            var javaFiles = Directory.GetFiles(JAVA_FILE_FOLDER,"*",SearchOption.AllDirectories);
-
             // init the envuerment
             SshM.ExecuteSingleCommand("rm -r -f" + BASE_DIR + "/FromTheTweet/javafiles");
             SshM.ExecuteSingleCommand("mkdir -p " + BASE_DIR + "/FromTheTweet/javafiles");
 
-            for (int i = 0; i < javaFiles.Length; i++)
-            {
-                // with full path as name
-                //SshM.TransferFileToMachine(javaFiles[i], "/home/training/FromTheTweet/javafiles" + javaFiles[i].Substring(javaFiles[i].IndexOf(JAVA_FILE_FOLDER) + JAVA_FILE_FOLDER.Length));
-
-                // all file to onr folder
-                SshM.TransferFileToMachine(javaFiles[i], BASE_DIR + "/FromTheTweet/javafiles/" + javaFiles[i].Substring(javaFiles[i].LastIndexOf("\\")+1));
-            }
+            return SshM.TransferFolderToMachine(javaFileFolder, BASE_DIR + "/FromTheTweet/javafiles");
         }
 
 
@@ -83,8 +78,9 @@ namespace Hadoop
                 // Creating the jar
                 SshM.ExecuteSingleCommand("cd " + BASE_DIR + "/FromTheTweet && jar -cvf " + BASE_DIR + "/FromTheTweet/FromTheTweet.jar -c solution/*.class;");
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine("Error: {0}", e);
                 return false;
             }
 
