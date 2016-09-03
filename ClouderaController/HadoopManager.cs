@@ -93,7 +93,7 @@ namespace Hadoop
             string StdOut = "", StdErr = "";
 
 
-            SshM.ExecuteSingleCommand("rm -f "+ BASE_DIR + "/FromTheTweet/output/part-r-00000");
+            SshM.ExecuteSingleCommand("rm -r -f "+ BASE_DIR + "/FromTheTweet/output");
 
             SshM.ExecuteSingleCommand("hadoop fs -rm -r " + HDFS_DIR + "/FromTheTweet");
 
@@ -121,7 +121,7 @@ namespace Hadoop
 
             // Handle output
             SshM.ExecuteSingleCommand("mkdir -p " + BASE_DIR + "/FromTheTweet/output");
-            SshM.ExecuteSingleCommand("hadoop fs -get FromTheTweet/output/part-r-00000  " + BASE_DIR + "/FromTheTweet/output/part-r-00000");
+            SshM.ExecuteSingleCommand("hadoop fs -get FromTheTweet/output/mainOutput/part-r-00000  " + BASE_DIR + "/FromTheTweet/output/part-r-00000");
         }
 
         private void TransferOutputFilesFromRemoteMachine(string remoteFile, string localPath)

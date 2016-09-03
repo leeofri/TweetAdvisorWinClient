@@ -2,7 +2,7 @@
 	<java_dir>D:\Personal\My Documents\final_proj\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\JavaCode</java_dir>
 	<tweets_dir>D:\Personal\My Documents\final_proj\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\Tweets</tweets_dir>
 	<results_dir>D:\Personal\My Documents\final_proj\TweetAdvisorWinClient\StockAnalyzer.Site\Resources\Results</results_dir>
-	<hadoop_master_node>192.168.14.105</hadoop_master_node>
+	<hadoop_master_node>192.168.14.9</hadoop_master_node>
 	<hadoop_user>training</hadoop_user>
 	<hadoop_pass>training</hadoop_pass>
 </config>
