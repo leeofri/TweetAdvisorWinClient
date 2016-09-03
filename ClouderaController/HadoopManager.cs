@@ -73,10 +73,10 @@ namespace Hadoop
                 //SshM.ExecuteSingleCommand("cd /home/training/FromTheTweet/ && cp -r javafiles/* ./");
 
                 // Compiling the javafiles - Making class files
-                SshM.ExecuteSingleCommand("javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/* -d "+BASE_DIR + "/FromTheTweet "+ BASE_DIR + "/FromTheTweet/javafiles/*.java");
+                SshM.ExecuteSingleCommand("cd " + BASE_DIR + "/FromTheTweet/javafiles/src && javac -cp /usr/lib/hadoop/*:/usr/lib/hadoop/client-0.20/*:/usr/lib/hadoop/lib/*:src/solution/ThirdParty/*:src/*: "+BASE_DIR+"/FromTheTweet/javafiles/src/solution/tfidf/*.java " + BASE_DIR + "/FromTheTweet/javafiles/src/solution/tfidf/model/*.java " + BASE_DIR + "/FromTheTweet/javafiles/src/solution/*.java ");
 
                 // Creating the jar
-                SshM.ExecuteSingleCommand("cd " + BASE_DIR + "/FromTheTweet && jar -cvf " + BASE_DIR + "/FromTheTweet/FromTheTweet.jar -c solution/*.class;");
+                SshM.ExecuteSingleCommand("cd " + BASE_DIR + "/FromTheTweet/javafiles/src && jar -cvf " + BASE_DIR + "/FromTheTweet/FromTheTweet.jar -c .");
             }
             catch (Exception e)
             {
@@ -107,8 +107,11 @@ namespace Hadoop
             //Upload files to hadoop HDFS
             SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + BASE_DIR + "/FromTheTweet/input "+ HDFS_DIR + "/FromTheTweet/input");
 
+            //upload config fill to HDFS
+            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + BASE_DIR + "/FromTheTweet/javafiles/userConfigFile.config " + HDFS_DIR + "/FromTheTweet/data");
+
             //Upload word dic to hadoop HDFS
-            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + BASE_DIR + "/FromTheTweet/javafiles/wordDictionary.txt " + HDFS_DIR + "/FromTheTweet");
+            SshM.ExecuteSingleCommand("hadoop fs -copyFromLocal " + BASE_DIR + "/FromTheTweet/javafiles/wordDictionary.txt " + HDFS_DIR + "/FromTheTweet/data");
 
             // Running the map reduce function from the jar
             SshM.ExecuteSingleCommand("hadoop jar " + BASE_DIR + "/FromTheTweet/FromTheTweet.jar solution.FinalProj " + HDFS_DIR + "/FromTheTweet/input/input " + HDFS_DIR + "/FromTheTweet/output",ref StdOut,ref StdErr);
